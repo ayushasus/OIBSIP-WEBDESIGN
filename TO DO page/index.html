@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="./style.css">
+
+<title>Daily Task Manager</title>
+</head>
+<body>
+  <div id="app">
+    <h1>Daily Task Manager</h1>
+    <input type="text" id="taskInput" placeholder="Enter a new task">
+    <button id="addButton">Add Task</button>
+
+    <h2>Pending Tasks</h2>
+    <ul id="pendingTaskList"></ul>
+
+    <h2>Completed Tasks</h2>
+    <ul id="completedTaskList"></ul>
+  </div>
+  
+  <script>
+    const addButton = document.getElementById('addButton');
+    const taskInput = document.getElementById('taskInput');
+    const pendingTaskList = document.getElementById('pendingTaskList');
+    const completedTaskList = document.getElementById('completedTaskList');
+
+    addButton.addEventListener('click', addTask);
+
+    function addTask() {
+      const taskText = taskInput.value.trim();
+      if (taskText !== '') {
+        const now = new Date();
+        const taskItem = document.createElement('li');
+        taskItem.innerHTML = `
+          <span>${taskText}</span>
+          <span>${formatDate(now)}</span>
+          <button class="completeButton">Complete</button>
+          <button class="editButton">Edit</button>
+          <button class="deleteButton">Delete</button>
+        `;
+
+        pendingTaskList.appendChild(taskItem);
+        taskInput.value = '';
+
+        const completeButton = taskItem.querySelector('.completeButton');
+        completeButton.addEventListener('click', completeTask);
+
+        const editButton = taskItem.querySelector('.editButton');
+        editButton.addEventListener('click', editTask);
+
+        const deleteButton = taskItem.querySelector('.deleteButton');
+        deleteButton.addEventListener('click', deleteTask);
+      }
+    }
+
+    function completeTask(event) {
+      const taskItem = event.target.parentElement;
+      const taskText = taskItem.querySelector('span:first-child').textContent;
+      const completionTime = new Date();
+      const completionItem = document.createElement('li');
+      completionItem.innerHTML = `
+        <span>${taskText}</span>
+        <span>${formatDate(completionTime)}</span>
+      `;
+      completionItem.classList.add('completed');
+      completedTaskList.appendChild(completionItem);
+      pendingTaskList.removeChild(taskItem);
+    }
+
+    function editTask(event) {
+      const taskItem = event.target.parentElement;
+      const taskText = taskItem.querySelector('span:first-child').textContent;
+      const editedText = prompt('Edit task:', taskText);
+      if (editedText !== null) {
+        taskItem.querySelector('span:first-child').textContent = editedText;
+      }
+    }
+
+    function deleteTask(event) {
+      const taskItem = event.target.parentElement;
+      const isCompleted = taskItem.classList.contains('completed');
+      if (isCompleted) {
+        completedTaskList.removeChild(taskItem);
+      } else {
+        pendingTaskList.removeChild(taskItem);
+      }
+    }
+
+    function formatDate(date) {
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    }
+  </script>
+</body>
+</html>
